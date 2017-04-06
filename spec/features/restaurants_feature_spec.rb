@@ -2,10 +2,10 @@ require 'rails_helper'
 
 feature 'restaurants' do
   context 'no restaurants have been added' do
-    scenario 'should display a prompt to add a restaurant' do
+    scenario 'should display a prompt to add a restaurant, if signed' do
       visit '/restaurants'
       expect(page).to have_content 'No restaurants yet'
-      expect(page).to have_link 'Add a restaurant'
+      # expect(page).to have_link 'Add a restaurant'
     end
   end
 
@@ -22,16 +22,30 @@ feature 'restaurants' do
     end
 
     context 'creating restaurants' do
-      scenario 'prompts user to fill out a form, then displays the new restaurant' do
+
+      scenario 'not possible unless signed in' do
         visit '/restaurants'
-        click_link 'Add a restaurant'
-        fill_in 'Name', with: 'KCF'
-        click_button 'Create Restaurant'
-        expect(page).to have_content 'KCF'
-        expect(current_path).to eq '/restaurants'
+        expect(page).not_to have_link 'Add a restaurant'
       end
 
-      context 'an invalid restaurant' do
+      scenario 'only by logged in users' do
+        visit '/users/sign_up'
+        fill_in 'Email', with: 'test@now.com'
+        fill_in 'Password', with: 'makers'
+        fill_in 'Password confirmation', with: 'makers'
+        click_button 'Sign up'
+        expect(page).to have_content 'You have signed up successfully'
+        expect(page).to have_link 'Add a restaurant'
+      end
+
+      context 'signed in user creating restaurants' do
+        before do
+          visit '/users/sign_up'
+          fill_in 'Email', with: 'test@now.com'
+          fill_in 'Password', with: 'makers'
+          fill_in 'Password confirmation', with: 'makers'
+          click_button 'Sign up'
+        end
         scenario 'does not let you submit a name that is too short' do
           visit '/restaurants'
           click_link 'Add a restaurant'
@@ -39,6 +53,15 @@ feature 'restaurants' do
           click_button 'Create Restaurant'
           expect(page).not_to have_css 'h2', text: 'kf'
           expect(page).to have_content 'error'
+        end
+
+        scenario 'prompts user to fill out a form, then displays the new restaurant' do
+          visit '/restaurants'
+          click_link 'Add a restaurant'
+          fill_in 'Name', with: 'KCF'
+          click_button 'Create Restaurant'
+          expect(page).to have_content 'KCF'
+          expect(current_path).to eq '/restaurants'
         end
       end
 
