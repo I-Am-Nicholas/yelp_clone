@@ -33,6 +33,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'capistrano-rails', group: :development
 
 gem 'omniauth-facebook'
+gem 'shoulda'
 
 
 group :development, :test do
@@ -44,6 +45,7 @@ group :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'rspec-collection_matchers'
+  gem 'shoulda-matchers'
 end
 
 group :development do

@@ -11,4 +11,11 @@ describe "restaurant" do
     expect(restaurant).to have(1).error_on(:name)
   end
 
+
+  it "has many reviews" do
+    restaurant = Restaurant.new(name: 'Burger King')
+    expect(restaurant).to have_many(:reviews)
+  end
+
+
 end
