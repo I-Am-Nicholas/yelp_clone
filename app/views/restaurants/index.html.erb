@@ -7,7 +7,7 @@
     <%= link_to "Review #{restaurant.name}", new_restaurant_review_path(restaurant) %><br><br>
     <% restaurant.reviews.each do |review|%>
       <%=review.thoughts%>
-      <%end%><br><br>
+      <%end%><br><br><br>
   <% end %>
 <% else %>
   No restaurants yet
