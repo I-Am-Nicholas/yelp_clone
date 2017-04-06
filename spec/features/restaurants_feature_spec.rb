@@ -28,6 +28,11 @@ feature 'restaurants' do
         expect(page).not_to have_link 'Add a restaurant'
       end
 
+      scenario 'not possible unless signed in' do
+        visit '/restaurants/new'
+        expect(page).to have_content 'You need to sign in or sign up before continuing'
+      end
+
       scenario 'only by logged in users' do
         visit '/users/sign_up'
         fill_in 'Email', with: 'test@now.com'
@@ -81,7 +86,14 @@ feature 'restaurants' do
 
   context 'editing restaurants' do
 
-    before { Restaurant.create name: 'KFC', description: 'Deep fried goodness', id: 1 }
+    before do
+       Restaurant.create name: 'KFC', description: 'Deep fried goodness', id: 1
+       visit '/users/sign_up'
+       fill_in 'Email', with: 'test@now.com'
+       fill_in 'Password', with: 'makers'
+       fill_in 'Password confirmation', with: 'makers'
+       click_button 'Sign up'
+     end
 
     scenario 'let a user edit a restaurant' do
       visit '/restaurants'
@@ -98,7 +110,14 @@ feature 'restaurants' do
 
   context 'deleting restaurants' do
 
-    before { Restaurant.create name: 'KFC', description: 'Deep fried goodness' }
+    before do
+       Restaurant.create name: 'KFC', description: 'Deep fried goodness'
+       visit '/users/sign_up'
+       fill_in 'Email', with: 'test@now.com'
+       fill_in 'Password', with: 'makers'
+       fill_in 'Password confirmation', with: 'makers'
+       click_button 'Sign up'
+     end
 
     scenario 'removes a restaurant when a user clicks a delete link' do
       visit '/restaurants'
