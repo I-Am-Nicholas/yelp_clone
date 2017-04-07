@@ -1,16 +1,20 @@
 require 'rails_helper'
 
 feature 'restaurants' do
+
+  before do
+    # visit '/restaurants'
+  end
+
   context 'no restaurants have been added' do
     scenario 'should display a prompt to add a restaurant, if signed' do
       visit '/restaurants'
       expect(page).to have_content 'No restaurants yet'
-      # expect(page).to have_link 'Add a restaurant'
     end
   end
 
-
   context 'restaurants have been added' do
+
     before do
       Restaurant.create(name: 'KFC')
     end
@@ -24,7 +28,7 @@ feature 'restaurants' do
     context 'creating restaurants' do
 
       scenario 'not possible unless signed in' do
-        visit '/restaurants'
+        # visit '/restaurants'
         expect(page).not_to have_link 'Add a restaurant'
       end
 
@@ -43,7 +47,8 @@ feature 'restaurants' do
         expect(page).to have_link 'Add a restaurant'
       end
 
-      context 'signed in user creating restaurants' do
+      context 'signed up user creates restaurants' do
+
         before do
           visit '/users/sign_up'
           fill_in 'Email', with: 'test@now.com'
@@ -51,8 +56,9 @@ feature 'restaurants' do
           fill_in 'Password confirmation', with: 'makers'
           click_button 'Sign up'
         end
-        scenario 'does not let you submit a name that is too short' do
-          visit '/restaurants'
+
+        scenario 'disallows a name that is too short' do
+          # visit '/restaurants'
           click_link 'Add a restaurant'
           fill_in 'Name', with: 'kf'
           click_button 'Create Restaurant'
@@ -61,17 +67,18 @@ feature 'restaurants' do
         end
 
         scenario 'prompts user to fill out a form, then displays the new restaurant' do
-          visit '/restaurants'
+          # visit '/restaurants'
           click_link 'Add a restaurant'
           fill_in 'Name', with: 'KCF'
           click_button 'Create Restaurant'
           expect(page).to have_content 'KCF'
           expect(current_path).to eq '/restaurants'
         end
-      end
 
+      end
     end
   end
+
   context "viewing restaurants" do
 
     let! (:kfc) { Restaurant.create(name:'KFC') }
@@ -95,11 +102,10 @@ feature 'restaurants' do
        click_button 'Sign up'
      end
 
-    scenario 'not let any other user to edit random restaurant' do
+    scenario 'only allow users to edit their own entries' do
       expect(page).to have_content 'KFC'
       expect(page).not_to have_link 'Edit KFC'
     end
-
 
   end
 
@@ -122,19 +128,41 @@ feature 'restaurants' do
 
   context 'reviewing restaurants' do
 
-  before { Restaurant.create name: 'KFC' }
+    before do
+      visit '/users/sign_up'
+      fill_in 'Email', with: 'test@now.com'
+      fill_in 'Password', with: 'makers'
+      fill_in 'Password confirmation', with: 'makers'
+      click_button 'Sign up'
+      click_link 'Add a restaurant'
+      fill_in 'Name', with: 'KFC'
+      click_button 'Create Restaurant'
+    end
 
-  scenario 'allows users to leave a review using a form' do
-     visit '/restaurants'
-     click_link 'Review KFC'
-     fill_in "Thoughts", with: "so so"
-     select '3', from: 'Rating'
-     click_button 'Leave Review'
+    scenario 'allows users to leave a review using a form' do
+       visit '/restaurants'
+       click_link 'Review KFC'
+       fill_in "Thoughts", with: "so so"
+       select '3', from: 'Rating'
+       click_button 'Leave Review'
 
-     expect(current_path).to eq '/restaurants'
-     expect(page).to have_content('so so')
+       expect(current_path).to eq '/restaurants'
+       expect(page).to have_content('so so')
+    end
+
+    scenario 'Users can only leave one review per restaurant' do
+       visit '/restaurants'
+       click_link 'Review KFC'
+       fill_in "Thoughts", with: "so so"
+       select '3', from: 'Rating'
+       click_button 'Leave Review'
+       click_link 'Review KFC'
+      expect(current_path).to eq '/restaurants'
+      expect(page).to have_content('so so')
+      expect(page).to have_content 'You have already reviewed this restaurant.'
+
+    end
+
   end
-
-end
 
 end
