@@ -4,7 +4,6 @@ class Restaurant < ActiveRecord::Base
 
   def has_been_reviewed_by(current_user, restaurant)
     @reviews = Review.where(:user_id => current_user.id, :restaurant_id => restaurant.id )
-p    @allreviews = Review.all
     @reviews.empty? ? false : true
   end
 end
