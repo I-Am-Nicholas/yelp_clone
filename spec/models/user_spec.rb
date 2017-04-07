@@ -10,4 +10,9 @@ describe "restaurant" do
     expect(user).to have_many(:reviews)
   end
 
+  it "has many reviewed restaurants" do
+    user = User.create(email: 'test@test.com', password: 'makers', password_confirmation: 'makers')
+    expect(user).to have_many(:reviewed_restaurants)
+  end
+
 end

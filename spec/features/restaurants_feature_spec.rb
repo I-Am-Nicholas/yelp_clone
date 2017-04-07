@@ -107,6 +107,14 @@ feature 'restaurants' do
       expect(page).not_to have_link 'Edit KFC'
     end
 
+    scenario 'allow user to edit their own entries' do
+      click_link 'Add a restaurant'
+      fill_in 'Name', with: 'McDonalds'
+      click_button 'Create Restaurant'
+      expect(page).to have_link 'Edit McDonalds'
+      expect(page).not_to have_link 'Edit KFC'
+    end
+
   end
 
   context 'deleting restaurants' do
@@ -124,45 +132,14 @@ feature 'restaurants' do
       visit '/restaurants'
       expect(page).not_to have_link 'Delete KFC'
     end
-  end
 
-  context 'reviewing restaurants' do
-
-    before do
-      visit '/users/sign_up'
-      fill_in 'Email', with: 'test@now.com'
-      fill_in 'Password', with: 'makers'
-      fill_in 'Password confirmation', with: 'makers'
-      click_button 'Sign up'
+    scenario 'allow user to only remove their own restaurant' do
       click_link 'Add a restaurant'
-      fill_in 'Name', with: 'KFC'
+      fill_in 'Name', with: 'McDonalds'
       click_button 'Create Restaurant'
+      expect(page).to have_link 'Delete McDonalds'
+      expect(page).not_to have_link 'Delete KFC'
     end
-
-    scenario 'allows users to leave a review using a form' do
-       visit '/restaurants'
-       click_link 'Review KFC'
-       fill_in "Thoughts", with: "so so"
-       select '3', from: 'Rating'
-       click_button 'Leave Review'
-
-       expect(current_path).to eq '/restaurants'
-       expect(page).to have_content('so so')
-    end
-
-    scenario 'Users can only leave one review per restaurant' do
-       visit '/restaurants'
-       click_link 'Review KFC'
-       fill_in "Thoughts", with: "so so"
-       select '3', from: 'Rating'
-       click_button 'Leave Review'
-       click_link 'Review KFC'
-      expect(current_path).to eq '/restaurants'
-      expect(page).to have_content('so so')
-      expect(page).to have_content 'You have already reviewed this restaurant.'
-
-    end
-
   end
 
 end
